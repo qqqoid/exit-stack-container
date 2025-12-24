@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "exit-stack-container"
-version = "0.1.0"
+version = "0.1.1"
 description = "Async lifecycle management with declarative dependency injection"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -37,3 +37,6 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/qqqoid/exit-stack-container"
 Issues = "https://github.com/qqqoid/exit-stack-container/issues"
+
+[tool.ruff]
+line-length = 135
