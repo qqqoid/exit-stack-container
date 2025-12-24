@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "exit-stack-container"
-version = "0.1.1"
+version = "0.1.2"
 description = "Async lifecycle management with declarative dependency injection"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -32,6 +32,13 @@ classifiers = [
 dependencies = [
     "msgspec>=0.20.0",
     "msgspec-settings>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipykernel>=6.29.5",
+    "ipython>=8.18.0",
+    "ipywidgets>=8.1.0",
 ]
 
 [project.urls]

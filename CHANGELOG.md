@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 (2025-12-24)
+
+### Changed
+- Simplified docstrings to minimal Google style across all modules
+- Improved error messages for consistency and clarity
+- Fixed generic type extraction logic in `AbstractContainer`
+
+
 ## 0.1.1 (2025-12-24)
 
 ### Changed

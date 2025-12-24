@@ -1,4 +1,4 @@
-"""DI container with async lifecycle management."""
+"""Async DI container with AsyncExitStack lifecycle."""
 
 from __future__ import annotations
 
@@ -14,14 +14,14 @@ from .container import AbstractContainer
 
 
 class AsyncExitStackContainer[T, V](AbstractContainer[T, V]):
-    """DI container with async lifecycle management."""
+    """Async container managing resource lifecycle with AsyncExitStack"""
 
     _settings: T
     _stack: AsyncExitStack | None = None
 
     async def __aenter__(self) -> V:
         if self._stack:
-            raise ContainerReuseError("This container instance has already been entered and cannot be reused before exiting.")
+            raise ContainerReuseError("Container already entered, create new instance or exit first")
 
         self._stack = AsyncExitStack()
         await self._stack.__aenter__()
@@ -47,7 +47,7 @@ class AsyncExitStackContainer[T, V](AbstractContainer[T, V]):
         return resources
 
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        """Exit the async context, cleaning up resources."""
+        """Exit context and cleanup all resources."""
         if self._stack:
             await self._stack.__aexit__(exc_type, exc_val, exc_tb)
             self._stack = None

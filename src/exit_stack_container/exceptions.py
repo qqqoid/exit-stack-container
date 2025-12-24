@@ -1,24 +1,24 @@
-"""Exceptions for container module."""
+"""Container-specific exceptions."""
 
 
 class ContainerError(Exception):
-    """Base exception for container errors."""
+    """Base exception for all container errors"""
 
 
 class CircularDependencyError(ContainerError):
-    """Raised when circular dependency detected in container."""
+    """Circular dependency detected during resolution"""
 
 
 class DependencyNotResolvedError(ContainerError):
-    """Raised when dependency is not yet resolved."""
+    """Dependency referenced before resolution"""
 
 
 class ContainerReuseError(ContainerError):
-    """Raised when attempting to reuse container instance."""
+    """Container instance re-entered before exit"""
 
 
 class InvalidContainerInheritance(ContainerError):
-    """Raised when container inheritance structure is invalid."""
+    """Invalid generic inheritance structure"""
 
 
 __all__ = [

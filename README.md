@@ -13,6 +13,9 @@ pip install exit-stack-container
 ## Quick Start
 
 ```python
+from msgspec import Struct
+from msgspec_settings import BaseSettings
+
 from exit_stack_container import AsyncExitStackContainer, BaseResources, Dependency, on_exit
 
 
@@ -63,7 +66,7 @@ async def main():
 - **Async lifecycle** — Automatic resource initialization and cleanup via async context manager
 - **Topological sorting** — Dependencies resolved in correct order automatically
 - **Circular detection** — Prevents circular dependency issues at runtime
-- **One-time use** — Container cannot be reused, preventing state bugs
+- **Single active context** — Container cannot be re-entered before exiting
 
 ## License
 

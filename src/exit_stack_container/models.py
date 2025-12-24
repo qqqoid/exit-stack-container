@@ -1,4 +1,4 @@
-"""DI container with async lifecycle management."""
+"""Base resource models for DI containers."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from msgspec_settings import BaseSettings
 
 
 class BaseResources[T = BaseSettings]:
-    """Base DTO for container resources."""
+    """Base resource container with settings"""
 
     settings: T
 

@@ -1,4 +1,4 @@
-"""DI container with async lifecycle management."""
+"""Dependency descriptor for declarative DI."""
 
 from __future__ import annotations
 
@@ -12,14 +12,14 @@ from .types import ResolvedDeps, ResourceFactory
 
 
 class Dependency:
-    """Declarative dependency injection descriptor."""
+    """Dependency descriptor with factory and kwargs"""
 
     def __init__(self, factory: ResourceFactory, **kwargs: Any) -> None:
         """Initialize dependency.
 
         Args:
-            factory: Factory function to create resource
-            **kwargs: Factory arguments (values or other Dependency instances)
+            factory: Factory function creating the resource.
+            **kwargs: Factory arguments (values or Dependency instances).
         """
         self.factory = factory
         self.kwargs = kwargs
@@ -29,13 +29,13 @@ class Dependency:
         self.name = name
 
     async def resolve(self, resolved_deps: ResolvedDeps) -> Any:
-        """Resolve and instantiate resource.
+        """Resolve dependencies and instantiate resource.
 
         Args:
-            resolved: Already resolved dependencies
+            resolved_deps: Already resolved dependencies.
 
         Returns:
-            Resource instance
+            Resource instance.
         """
 
         resolved_kwargs = {}
@@ -44,7 +44,7 @@ class Dependency:
                 resolved_kwargs[key] = value
             else:
                 if value.name not in resolved_deps:
-                    raise DependencyNotResolvedError(f"Cannot resolve dependency '{value.name}' for '{self.name}': ")
+                    raise DependencyNotResolvedError(f"Dependency '{value.name}' not resolved for '{self.name}'")
                 resolved_kwargs[key] = resolved_deps[value.name]
         result = self.factory(**resolved_kwargs)
 

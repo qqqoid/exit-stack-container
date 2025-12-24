@@ -1,4 +1,4 @@
-"""DI container with async lifecycle management."""
+"""Cleanup registration decorator."""
 
 from __future__ import annotations
 
@@ -9,13 +9,13 @@ from .types import CleanupGetter, ResourceFactory
 
 
 def on_exit(cleanup_getter: CleanupGetter) -> Callable[[ResourceFactory], ResourceFactory]:
-    """Register cleanup callback for factory.
+    """Register cleanup callback for resource factory.
 
     Args:
-        cleanup_getter: Extracts cleanup method from instance (e.g., lambda c: c.close)
+        cleanup_getter: Function extracting cleanup method from instance.
 
     Returns:
-        Decorated factory
+        Decorated factory function.
     """
 
     def decorator(factory: ResourceFactory) -> ResourceFactory:

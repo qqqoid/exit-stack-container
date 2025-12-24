@@ -12,23 +12,21 @@ from ..types import CleanupFn, DependencyGraph
 
 
 def extract_origin_base(cls: type) -> type:
-    """Extract the first original base class from __orig_bases__."""
+    """Extract first original base class from __orig_bases__."""
     if orig_bases := getattr(cls, "__orig_bases__", None):
         return orig_bases[0]
-    raise InvalidContainerInheritance(
-        f"Cannot extract base from {cls.__name__}: __orig_bases__ not found. Ensure proper generic inheritance."
-    )
+    raise InvalidContainerInheritance(f"{cls.__name__} missing __orig_bases__, ensure proper generic inheritance")
 
 
 def extract_origin(cls: type) -> type:
-    """Extract __origin__ from a generic type."""
+    """Extract __origin__ from generic type."""
     if origin := getattr(cls, "__origin__", None):
         return origin
-    raise InvalidContainerInheritance(f"Cannot extract __origin__ from {cls}: not a generic type. Ensure proper generic inheritance.")
+    raise InvalidContainerInheritance(f"{cls} is not a generic type")
 
 
 def make_resolution_order(dependencies: dict[str, Dependency]) -> list[str]:
-    """Create a resolution order based on dependencies using topological sort."""
+    """Compute topological sort of dependency graph."""
     graph: DependencyGraph = {}
     for name, dep in dependencies.items():
         deps = set()
@@ -54,15 +52,13 @@ def make_resolution_order(dependencies: dict[str, Dependency]) -> list[str]:
 
     if len(ordered_deps) != len(graph):
         pending = [name for name, degree in in_degree.items() if degree > 0]
-        raise CircularDependencyError(
-            f"Cannot resolve dependencies: circular dependency detected (resolved: {ordered_deps}, pending: {pending})"
-        )
+        raise CircularDependencyError(f"Circular dependency detected: {pending} (resolved: {ordered_deps})")
 
     return ordered_deps
 
 
 def make_cleanup(cleanup_fn: CleanupFn) -> Callable[[], Awaitable[None]]:
-    """Wrap cleanup function to ensure it's async."""
+    """Wrap sync or async cleanup function as async."""
     if inspect.iscoroutinefunction(cleanup_fn):
         return cleanup_fn
 
