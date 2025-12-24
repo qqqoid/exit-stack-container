@@ -2,7 +2,7 @@
 
 Async lifecycle management with declarative dependency injection for Python 3.13+.
 
-Automatically initialize and cleanup application resources (database connections, caches, clients) when your app starts and stops using async context manager pattern.
+Automatically initialize and cleanup resources (database, cache, clients) using async context managers.
 
 ## Installation
 
@@ -18,19 +18,30 @@ from msgspec_settings import BaseSettings
 
 from exit_stack_container import AsyncExitStackContainer, BaseResources, Dependency, on_exit
 
-
 class Database:
     def __init__(self, host: str, port: int):
         print(f"Database connected to {host}:{port}")
 
-    def close(self):
+    async def close(self):
         print("Database connection closed")
 
+    async def query(self, query: str):
+        print(f"Executing query: {query}")
+
+class Usecase:
+    def __init__(self, database: Database):
+        self.database = database
+        print(f"Usecase created with database at {database}")
+
+    async def __call__(self):
+        await self.database.query("SELECT * FROM table")
 
 @on_exit(lambda db: db.close)
-def create_database(*, host: str, port: int) -> Database:
+async def create_database(*, host: str, port: int) -> Database:
     return Database(host=host, port=port)
 
+def create_usecase(*, database: Database) -> Usecase:
+    return Usecase(database=database)
 
 class DatabaseSettings(Struct, frozen=True):
     host: str = "localhost"
@@ -40,7 +51,7 @@ class AppSettings(BaseSettings):
     database: DatabaseSettings
 
 class AppResources(BaseResources[AppSettings]):
-    database: Database
+    usecase: Usecase
 
 class AppContainer(AsyncExitStackContainer[AppSettings, AppResources]):
     _settings: AppSettings = AppSettings()
@@ -51,22 +62,33 @@ class AppContainer(AsyncExitStackContainer[AppSettings, AppResources]):
         port=_settings.database.port,
     )
 
+    usecase: Dependency = Dependency(
+        create_usecase,
+        database=database,
+    )
 
-# Use with async context manager - automatic init and cleanup
 async def main():
     async with AppContainer() as resources:
-        # resources.database is ready to use
-        # cleanup happens automatically on exit
-        pass
+        await resources.usecase()
+
+await main()
+```
+
+**Output:**
+```
+Database connected to localhost:5432
+Usecase created with database at <__main__.Database object at 0x7f4669422120>
+Executing query: SELECT * FROM table
+Database connection closed
 ```
 
 ## Features
 
-- **Declarative DI** — Define dependencies with type-safe descriptors
-- **Async lifecycle** — Automatic resource initialization and cleanup via async context manager
-- **Topological sorting** — Dependencies resolved in correct order automatically
-- **Circular detection** — Prevents circular dependency issues at runtime
-- **Single active context** — Container cannot be re-entered before exiting
+- **Declarative DI** — Type-safe dependency descriptors
+- **Async lifecycle** — Automatic init and cleanup via context managers
+- **Topological sorting** — Correct dependency resolution order
+- **Circular detection** — Prevents circular dependency issues
+- **Single active context** — Cannot re-enter before exit
 
 ## License
 
