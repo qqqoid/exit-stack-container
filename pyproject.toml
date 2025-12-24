@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "exit-stack-container"
-version = "0.1.2"
+version = "0.1.3"
 description = "Async lifecycle management with declarative dependency injection"
 readme = "README.md"
 requires-python = ">=3.13"

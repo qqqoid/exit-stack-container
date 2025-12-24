@@ -24,7 +24,6 @@ class AsyncExitStackContainer[T, V](AbstractContainer[T, V]):
             raise ContainerReuseError("Container already entered, create new instance or exit first")
 
         self._stack = AsyncExitStack()
-        await self._stack.__aenter__()
 
         resolved: ResolvedDeps = {}
 
@@ -41,9 +40,13 @@ class AsyncExitStackContainer[T, V](AbstractContainer[T, V]):
         resources = self.resources_class()
         setattr(resources, "settings", self._settings)
 
+        annotations = getattr(self.resources_class, "__annotations__", {})
         for name, instance in resolved.items():
+            if name not in annotations:
+                continue
             setattr(resources, name, instance)
 
+        await self._stack.__aenter__()
         return resources
 
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:

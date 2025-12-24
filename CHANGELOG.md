@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3 (2025-12-24)
+
+### Changed
+- Resources population now respects `__annotations__` - only annotated fields are set
+- Improved README example with realistic dependency chain
+
+
 ## 0.1.2 (2025-12-24)
 
 ### Changed
